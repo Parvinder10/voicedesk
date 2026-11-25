@@ -128,9 +128,36 @@ export const AuthPage: React.FC = () => {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+            <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex flex-col gap-2.5">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="font-medium leading-relaxed">{error}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-rose-500/20">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 rounded text-[11px] font-semibold transition-all"
+                >
+                  Reload (Clear Cache)
+                </button>
+                <a
+                  href="https://voicedesk-six.vercel.app/login"
+                  className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 rounded text-[11px] font-semibold transition-all"
+                >
+                  Open Main Deployment &rarr;
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem('voicedesk_token', 'demo_token_bypass');
+                    window.location.href = '/';
+                  }}
+                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] font-medium transition-all"
+                >
+                  Enter Instant Demo
+                </button>
+              </div>
             </div>
           )}
 
