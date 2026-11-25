@@ -6,6 +6,8 @@ from app.api.v1.customers import router as customers_router
 from app.api.v1.services import router as services_router
 from app.api.v1.staff import router as staff_router
 from app.api.v1.settings import router as settings_router
+from app.api.v1.availability import router as availability_router
+from app.api.v1.appointments import router as appointments_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -51,3 +53,5 @@ app.include_router(customers_router, prefix=settings.API_V1_STR)
 app.include_router(services_router, prefix=settings.API_V1_STR)
 app.include_router(staff_router, prefix=settings.API_V1_STR)
 app.include_router(settings_router, prefix=settings.API_V1_STR)
+app.include_router(availability_router, prefix=settings.API_V1_STR)
+app.include_router(appointments_router, prefix=settings.API_V1_STR)
