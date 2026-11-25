@@ -8,6 +8,7 @@ from app.api.v1.staff import router as staff_router
 from app.api.v1.settings import router as settings_router
 from app.api.v1.availability import router as availability_router
 from app.api.v1.appointments import router as appointments_router
+from app.api.v1.knowledge import router as knowledge_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -55,3 +56,4 @@ app.include_router(staff_router, prefix=settings.API_V1_STR)
 app.include_router(settings_router, prefix=settings.API_V1_STR)
 app.include_router(availability_router, prefix=settings.API_V1_STR)
 app.include_router(appointments_router, prefix=settings.API_V1_STR)
+app.include_router(knowledge_router, prefix=settings.API_V1_STR)
