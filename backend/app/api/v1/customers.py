@@ -29,14 +29,20 @@ def list_customers(
     """Retrieve customers for the authenticated organization with optional search and pagination."""
     query = db.query(Customer).filter(Customer.organization_id == org.id)
     if q:
-        search_filter = f"%{q}%"
-        query = query.filter(
-            or_(
-                Customer.name.ilike(search_filter),
-                Customer.phone.ilike(search_filter),
-                Customer.email.ilike(search_filter)
-            )
-        )
+        cleaned_q = q.strip()
+        search_filter = f"%{cleaned_q}%"
+        # If query has digits, also search for the raw digits
+        digits_only = re.sub(r'\D', '', cleaned_q)
+        filters = [
+            Customer.name.ilike(search_filter),
+            Customer.phone.ilike(search_filter),
+            Customer.email.ilike(search_filter)
+        ]
+        if digits_only and len(digits_only) >= 4:
+            filters.append(Customer.phone.ilike(f"%{digits_only}%"))
+
+        query = query.filter(or_(*filters))
+
     return query.order_by(Customer.created_at.desc()).offset(skip).limit(limit).all()
 
 
