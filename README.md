@@ -1,8 +1,26 @@
 # VoiceDesk — AI-Powered Voice Receptionist
 
+[![Live Demo](https://img.shields.io/badge/Live_App-voicedesk--six.vercel.app-10b981?style=for-the-badge&logo=vercel)](https://voicedesk-six.vercel.app)
+[![API Status](https://img.shields.io/badge/API-Online_200_OK-0ea5e9?style=for-the-badge)](https://voicedesk-six.vercel.app/api/v1/health)
+
 **VoiceDesk** is a multi-tenant, enterprise-grade AI inbound voice receptionist SaaS built for appointment-driven businesses including medical clinics, dental practices, salons & spas, educational institutes, and service agencies.
 
 It natively integrates with **Vapi** for inbound telephony and automated function calling, features a **RAG Knowledge Assistant** with prompt injection defenses, provides a **concurrency-safe appointment booking engine** that prevents double bookings, and delivers an intuitive, full-featured **React/TypeScript dashboard**.
+
+---
+
+## 🌐 Live Application & Demo Links
+
+- **Production URL**: [https://voicedesk-six.vercel.app](https://voicedesk-six.vercel.app)
+- **Sign In / Registration**: [https://voicedesk-six.vercel.app/login](https://voicedesk-six.vercel.app/login)
+- **API Health Endpoint**: [https://voicedesk-six.vercel.app/api/v1/health](https://voicedesk-six.vercel.app/api/v1/health)
+
+### 🔑 Verified Demo Credentials
+| Role | Email | Password | Organization |
+| :--- | :--- | :--- | :--- |
+| **Clinic Owner** | `admin@apexdental.com` | `Password123!` | Apex Dental Clinic |
+
+*(Or click **"Quick Demo: Dental Clinic"** or **"Quick Demo: Salon & Spa"** on the registration tab to auto-fill and create an instant test business)*
 
 ---
 
