@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from app.config import settings
 from app.api.v1.auth import router as auth_router
+from app.api.v1.customers import router as customers_router
+from app.api.v1.services import router as services_router
+from app.api.v1.staff import router as staff_router
+from app.api.v1.settings import router as settings_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -44,3 +47,7 @@ def health_check():
 
 # Include Routers
 app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(customers_router, prefix=settings.API_V1_STR)
+app.include_router(services_router, prefix=settings.API_V1_STR)
+app.include_router(staff_router, prefix=settings.API_V1_STR)
+app.include_router(settings_router, prefix=settings.API_V1_STR)
