@@ -81,7 +81,12 @@ export const VoiceAgentPage: React.FC = () => {
       setSyncPayload(res);
       setIsSyncModalOpen(true);
     } catch (err: any) {
-      alert(err.message || 'Failed to sync assistant configuration');
+      if (err.message && err.message.toLowerCase().includes('user not found')) {
+        alert('Your session expired. Please sign in again to refresh your business session.');
+        window.location.href = '/login';
+      } else {
+        alert(err.message || 'Failed to sync assistant configuration');
+      }
     }
   };
 

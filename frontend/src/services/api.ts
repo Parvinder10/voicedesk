@@ -91,6 +91,11 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    if (response.status === 404 && errorData.detail === 'User not found.') {
+      localStorage.removeItem('voicedesk_token');
+      localStorage.removeItem('voicedesk_refresh_token');
+      localStorage.removeItem('voicedesk_user');
+    }
     let message = errorData.detail;
     if (!message) {
       if (response.status === 405) {
