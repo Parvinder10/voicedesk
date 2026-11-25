@@ -1,6 +1,9 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+from app.database import Base, engine
+import app.models  # noqa: F401
 from app.api.v1.auth import router as auth_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.customers import router as customers_router
@@ -13,6 +16,17 @@ from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.vapi import router as vapi_router
 from app.api.v1.calls import router as calls_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure database schema is ready on startup
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"Database schema initialization warning: {e}")
+    yield
+
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
@@ -20,13 +34,14 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
+    lifespan=lifespan,
 )
 
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS if settings.CORS_ORIGINS else ["*"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

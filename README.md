@@ -243,15 +243,30 @@ This spins up:
 
 ---
 
-## 6. Live Demo Walkthrough Guide
+## 7. Cloud Deployment & Connecting Vercel to Backend
 
-To test the application from end-to-end:
-1. **Register Business**: Go to `http://localhost:5173/login`, click **"Quick Demo: Dental Clinic"**, and submit registration.
-2. **Review Services**: Navigate to **Services**; observe default service with duration and price. Add new services as desired.
-3. **Configure Operating Hours**: Go to **Availability**; view weekly open/close hours and add scheduled closures.
-4. **Upload Knowledge Document**: Go to **Knowledge Base**, click **"Upload Demo Knowledge Document"**; observe instant extraction, chunking, and embedding generation.
-5. **Test Grounded RAG**: Type a question in the **Live Semantic Query Tester** (e.g., *"How much does teeth whitening cost?"*); inspect the verified response and source citation.
-6. **Simulate Inbound Voice Call**: Go to **Voice Agent**, select scenario *"Appointment Inquiry & Booking Workflow"*, and click **"Run Inbound Test Call"**; observe real-time tool execution (`identify_customer` -> `check_availability` -> `book_appointment` -> `end-of-call-report`).
-7. **View Appointments & Calendar**: Switch to **Appointments**; verify the booked slot in Day/Week/Month view. Test **Reschedule** or **Cancel**.
-8. **Inspect Call Intelligence**: Switch to **Call Logs**; click on the call to view duration, outcome, and full transcript.
-9. **Inspect Analytics**: Navigate to **Analytics** or **Dashboard**; view live KPIs computed from database records.
+### Deploying the Frontend on Vercel
+1. The frontend is configured for instant Vercel deployment with Vite and client-side SPA routing (`vercel.json`).
+2. In the Vercel Dashboard for your project (e.g. `voicedesk`):
+   - Go to **Settings** -> **Environment Variables**.
+   - Add:
+     - `VITE_API_BASE_URL`: URL of your deployed backend (e.g., `https://voicedesk-api.onrender.com` or your custom domain).
+   - Trigger a redeployment.
+   - Now the frontend communicates directly with your live backend API!
+
+### Deploying the Backend (Render / Railway / Docker)
+
+#### Option A: Render (1-Click Blueprint)
+1. In [Render](https://render.com), click **New +** -> **Blueprint**.
+2. Connect your GitHub repository (`voicedesk`).
+3. Render reads `render.yaml` and provisions:
+   - **PostgreSQL Database** (`voicedesk-db`)
+   - **FastAPI Web Service** (`voicedesk-api`) running `uvicorn app.main:app`
+4. Copy the resulting service URL (e.g., `https://voicedesk-api.onrender.com`).
+5. Add `VITE_API_BASE_URL=https://voicedesk-api.onrender.com` in your Vercel Environment Variables.
+
+#### Option B: Railway / Fly.io / Docker
+1. The included `Dockerfile` and `Procfile` support direct deployment on Railway, Fly.io, or any container platform.
+2. Set the `DATABASE_URL` environment variable pointing to your PostgreSQL instance.
+3. Once running, copy your backend URL into Vercel's `VITE_API_BASE_URL`.
+

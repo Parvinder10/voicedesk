@@ -1,4 +1,12 @@
-const API_BASE = '/api/v1';
+const RAW_BASE = (((import.meta as any).env?.VITE_API_BASE_URL as string) || '').trim().replace(/\/+$/, '');
+export const API_BASE = RAW_BASE
+  ? (RAW_BASE.endsWith('/api/v1') ? RAW_BASE : `${RAW_BASE}/api/v1`)
+  : '/api/v1';
+
+export function buildApiUrl(endpoint: string): string {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return `${API_BASE}${cleanEndpoint}`;
+}
 
 export class ApiError extends Error {
   status: number;
@@ -23,7 +31,8 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const url = buildApiUrl(endpoint);
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -33,7 +42,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
     const refreshToken = localStorage.getItem('voicedesk_refresh_token');
     if (refreshToken && !endpoint.includes('/auth/refresh')) {
       try {
-        const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+        const refreshRes = await fetch(buildApiUrl('/auth/refresh'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: refreshToken }),
@@ -45,7 +54,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
             localStorage.setItem('voicedesk_refresh_token', tokenData.refresh_token);
           }
           headers.set('Authorization', `Bearer ${tokenData.access_token}`);
-          const retryRes = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+          const retryRes = await fetch(url, { ...options, headers });
           if (!retryRes.ok) {
             const errData = await retryRes.json().catch(() => ({}));
             throw new ApiError(retryRes.status, errData.detail || 'Request failed', errData);
@@ -63,7 +72,14 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const message = errorData.detail || `Request failed with status ${response.status}`;
+    let message = errorData.detail;
+    if (!message) {
+      if (response.status === 405) {
+        message = 'Method Not Allowed (405): The API endpoint could not be reached. Ensure your backend server is running and VITE_API_BASE_URL is configured.';
+      } else {
+        message = `Request failed with status ${response.status}`;
+      }
+    }
     throw new ApiError(response.status, message, errorData);
   }
 

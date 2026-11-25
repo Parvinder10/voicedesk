@@ -15,16 +15,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
     # Database (Defaults to SQLite for local standalone development/test, overridden by env for PostgreSQL)
-    DATABASE_URL: str = "sqlite:///./voicedesk.db"
+    DATABASE_URL: str = "sqlite:////tmp/voicedesk.db" if os.environ.get("VERCEL") else "sqlite:///./voicedesk.db"
     
     # CORS
     CORS_ORIGINS: List[str] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000"
+        "*"
     ]
 
     # Voice / Vapi Integration
@@ -41,8 +36,8 @@ class Settings(BaseSettings):
     DEFAULT_TIMEZONE: str = "Asia/Kolkata"
     
     # Storage
-    STORAGE_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
+    STORAGE_DIR: str = "/tmp/voicedesk_data" if os.environ.get("VERCEL") else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+    UPLOAD_DIR: str = "/tmp/voicedesk_uploads" if os.environ.get("VERCEL") else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -52,5 +47,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-os.makedirs(settings.STORAGE_DIR, exist_ok=True)
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+try:
+    os.makedirs(settings.STORAGE_DIR, exist_ok=True)
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+except Exception:
+    pass
