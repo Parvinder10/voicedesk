@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: voicedesk_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-voicedesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voicedesk_secret_password}
+      POSTGRES_DB: ${POSTGRES_DB:-voicedesk}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voicedesk} -d ${POSTGRES_DB:-voicedesk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: voicedesk_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-voicedesk}:${POSTGRES_PASSWORD:-voicedesk_secret_password}@db:5432/${POSTGRES_DB:-voicedesk}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production-super-secure-32chars}
+      - VAPI_API_KEY=${VAPI_API_KEY:-}
+      - VAPI_WEBHOOK_SECRET=${VAPI_WEBHOOK_SECRET:-voicedesk-vapi-webhook-secret}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - DEFAULT_TIMEZONE=Asia/Kolkata
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/uploads:/app/uploads
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: voicedesk_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
