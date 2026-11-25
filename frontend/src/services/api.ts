@@ -1,7 +1,26 @@
 const RAW_BASE = (((import.meta as any).env?.VITE_API_BASE_URL as string) || '').trim().replace(/\/+$/, '');
-export const API_BASE = RAW_BASE
-  ? (RAW_BASE.endsWith('/api/v1') ? RAW_BASE : `${RAW_BASE}/api/v1`)
-  : '/api/v1';
+
+function resolveApiBase(): string {
+  if (RAW_BASE) {
+    return RAW_BASE.endsWith('/api/v1') ? RAW_BASE : `${RAW_BASE}/api/v1`;
+  }
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    const host = window.location.hostname;
+    // Local development
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return '/api/v1';
+    }
+    // Main production deployment with backend
+    if (host === 'voicedesk-six.vercel.app') {
+      return '/api/v1';
+    }
+    // External or secondary frontend deployments (e.g. frontend-ij5l.vercel.app)
+    return 'https://voicedesk-six.vercel.app/api/v1';
+  }
+  return '/api/v1';
+}
+
+export const API_BASE = resolveApiBase();
 
 export function buildApiUrl(endpoint: string): string {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
